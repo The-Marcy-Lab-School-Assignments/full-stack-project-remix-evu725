@@ -1,20 +1,19 @@
-# Todo App — Full-Stack Case Study
+# Daily Memory App — Full-Stack Case Study
 
-A full-stack Todo app built with React, Express, and Postgres. Demonstrates session-based authentication, session rehydration, auth-dependent data fetching, and conditional rendering — the same patterns students use in their full-stack projects.
+A full-stack time daily memory app built with React, Express, and Postgres. Demonstrates session-based authentication, session rehydration, auth-dependent data fetching, and conditional rendering — the same patterns students use in their full-stack projects.
 
 ## User Stories
-
 **Auth**
 - A user can register for an account with a username and password
 - A user can log in to an existing account
 - A user can log out
 - A returning user who has an active session is automatically logged in when they revisit the app
 
-**Todos**
-- A logged-in user can see all of their todos
-- A logged-in user can create a new todo by entering a title
-- A logged-in user can mark a todo as complete or incomplete
-- A logged-in user can delete a todo
+**Memo**
+- A logged-in user can see al of their memos
+- A logged-in user can create a new memo by entering description
+- A logged-in user can mark a memo public or private
+- A logged-in user can delete a memo
 
 ## Schema
 
@@ -31,9 +30,16 @@ todo_id     SERIAL PRIMARY KEY
 title       TEXT NOT NULL
 is_complete BOOLEAN DEFAULT FALSE
 user_id     INTEGER REFERENCES users(user_id) ON DELETE CASCADE
+
+memos
+─────────────────────────────
+memo_id  SERIAL PRIMARY KEY
+description TEXT NOT NULL
+is_public   BOOLEAN DEFAULT FALSE
+user_id     INTEGER REFERENCES users(user_id) ON DELETE CASCADE
 ```
 
-A user has many todos. Deleting a user cascades to delete all of their todos.
+A user has many capsules. Deleting a user cascades to delete all of their capsules.
 
 ## API Contract
 
@@ -120,8 +126,11 @@ swe-casestudy-7-todo-app/
 │   │   │   └── todo-adapters.js  # Fetch adapters for /api/todos/* endpoints
 │   │   └── components/
 │   │       ├── AuthPage.jsx    # Login + Register forms (shown when logged out)
+│   │       ├── MemoPage.jsx    # Main app container (shown when logged in)
 │   │       ├── TodoPage.jsx    # Main app container (shown when logged in)
+│   │       ├── AddMemoForm.jsx # Form to create a new todo
 │   │       ├── AddTodoForm.jsx # Form to create a new todo
+│   │       ├── MemoList.jsx    # Renders a list of TodoItems
 │   │       ├── TodoList.jsx    # Renders a list of TodoItems
 │   │       └── TodoItem.jsx    # Single todo: checkbox, title, delete button
 │   └── vite.config.js      # Proxies /api requests to Express in development
