@@ -10,7 +10,7 @@ A full-stack time daily memory app built with React, Express, and Postgres. Demo
 - A returning user who has an active session is automatically logged in when they revisit the app
 
 **Memo**
-- A logged-in user can see al of their memos
+- A logged-in user can see all of their memos
 - A logged-in user can create a new memo by entering description
 - A logged-in user can mark a memo public or private
 - A logged-in user can delete a memo
@@ -24,13 +24,6 @@ user_id       SERIAL PRIMARY KEY
 username      TEXT UNIQUE NOT NULL
 password_hash TEXT NOT NULL
 
-todos
-─────────────────────────────
-todo_id     SERIAL PRIMARY KEY
-title       TEXT NOT NULL
-is_complete BOOLEAN DEFAULT FALSE
-user_id     INTEGER REFERENCES users(user_id) ON DELETE CASCADE
-
 memos
 ─────────────────────────────
 memo_id  SERIAL PRIMARY KEY
@@ -39,7 +32,7 @@ is_public   BOOLEAN DEFAULT FALSE
 user_id     INTEGER REFERENCES users(user_id) ON DELETE CASCADE
 ```
 
-A user has many capsules. Deleting a user cascades to delete all of their capsules.
+A user has many capsules. Deleting a user cascades to delete all of their memos.
 
 ## API Contract
 
@@ -56,10 +49,10 @@ A user has many capsules. Deleting a user cascades to delete all of their capsul
 
 | Method | Endpoint              | Request Body      | Response                                     |
 | ------ | --------------------- | ----------------- | -------------------------------------------- |
-| GET    | `/api/todos`          | —                 | `[{ todo_id, title, is_complete, user_id }]` |
-| POST   | `/api/todos`          | `{ title }`       | `{ todo_id, title, is_complete, user_id }`   |
-| PATCH  | `/api/todos/:todo_id` | `{ is_complete }` | `{ todo_id, title, is_complete, user_id }`   |
-| DELETE | `/api/todos/:todo_id` | —                 | `{ todo_id, title, is_complete, user_id }`   |
+| GET    | `/api/memos`          | —                 | `[{ memo_id, title, is_public, user_id }]` |
+| POST   | `/api/memos`          | `{ title }`       | `{ memo_id, title, is_public, user_id }`   |
+| PATCH  | `/api/memos/:memo_id` | `{ is_public }` | `{ memo_id, title, is_public, user_id }`   |
+| DELETE | `/api/memos/:memo_id` | —                 | `{ memo_id, title, is_public, user_id }`   |
 
 ## Setup
 
@@ -68,7 +61,7 @@ A user has many capsules. Deleting a user cascades to delete all of their capsul
 Create a local Postgres database:
 
 ```sh
-createdb todos_casestudy
+createdb memos
 ```
 
 ### 2. Server
@@ -123,25 +116,25 @@ swe-casestudy-7-todo-app/
 │   │   ├── App.jsx         # Root component: currentUser state, session rehydration, auth handlers
 │   │   ├── adapters/
 │   │   │   ├── auth-adapters.js  # Fetch adapters for /api/auth/* endpoints
-│   │   │   └── todo-adapters.js  # Fetch adapters for /api/todos/* endpoints
+│   │   │   └── memo-adapters.js  # Fetch adapters for /api/todos/* endpoints
 │   │   └── components/
 │   │       ├── AuthPage.jsx    # Login + Register forms (shown when logged out)
 │   │       ├── MemoPage.jsx    # Main app container (shown when logged in)
-│   │       ├── TodoPage.jsx    # Main app container (shown when logged in)
+│   │       ├── MemoPage.jsx    # Main app container (shown when logged in)
 │   │       ├── AddMemoForm.jsx # Form to create a new todo
 │   │       ├── AddTodoForm.jsx # Form to create a new todo
-│   │       ├── MemoList.jsx    # Renders a list of TodoItems
-│   │       ├── TodoList.jsx    # Renders a list of TodoItems
-│   │       └── TodoItem.jsx    # Single todo: checkbox, title, delete button
+│   │       ├── MemoList.jsx    # Renders a list of MemoItems
+│   │       ├── MemoList.jsx    # Renders a list of MemoItems
+│   │       └── MemoItem.jsx    # Single memo: checkbox, title, delete button
 │   └── vite.config.js      # Proxies /api requests to Express in development
 └── server/                 # Express + Postgres API
     ├── index.js            # App entry point, route definitions
     ├── controllers/
     │   ├── authControllers.js  # register, login, logout, getMe
-    │   └── todoControllers.js  # list, create, update, delete todos
+    │   └── memoControllers.js  # list, create, update, delete todos
     ├── models/
     │   ├── userModel.js    # SQL queries for the users table
-    │   └── todoModel.js    # SQL queries for the todos table
+    │   └── memoModel.js    # SQL queries for the memos table
     ├── middleware/
     │   ├── checkAuthentication.js  # Blocks unauthenticated requests
     │   └── logRoutes.js            # Logs each incoming request

@@ -5,7 +5,7 @@ const SALT_ROUNDS = 8;
 
 const seed = async () => {
   // Drop tables in reverse dependency order (todos references users via FK)
-  await pool.query('DROP TABLE IF EXISTS todos');
+  await pool.query('DROP TABLE IF EXISTS memos');
   await pool.query('DROP TABLE IF EXISTS users');
 
   await pool.query(`
@@ -17,10 +17,10 @@ const seed = async () => {
   `);
 
   await pool.query(`
-    CREATE TABLE todos (
-      todo_id     SERIAL PRIMARY KEY,
+    CREATE TABLE memos (
+      memo_id     SERIAL PRIMARY KEY,
       title       TEXT NOT NULL,
-      is_complete BOOLEAN NOT NULL DEFAULT FALSE,
+      is_public BOOLEAN NOT NULL DEFAULT FALSE,
       user_id     INT REFERENCES users(user_id) ON DELETE CASCADE
     )
   `);
@@ -41,14 +41,24 @@ const seed = async () => {
 
   const [alice, bob] = users;
 
+  // await pool.query(`
+  //   INSERT INTO todos (title, is_complete, user_id) VALUES
+  //     ('Buy groceries',        FALSE, $1),
+  //     ('Walk the dog',         FALSE, $1),
+  //     ('Read a book',          TRUE,  $1),
+  //     ('Set up the database',  TRUE,  $2),
+  //     ('Build the API',        TRUE,  $2),
+  //     ('Build the frontend',   FALSE, $2)
+  // `, [alice.user_id, bob.user_id]);
+
   await pool.query(`
     INSERT INTO todos (title, is_complete, user_id) VALUES
-      ('Buy groceries',        FALSE, $1),
-      ('Walk the dog',         FALSE, $1),
-      ('Read a book',          TRUE,  $1),
-      ('Set up the database',  TRUE,  $2),
-      ('Build the API',        TRUE,  $2),
-      ('Build the frontend',   FALSE, $2)
+      ('Certain moments stay with you forever.',                  FALSE, $1),
+      ('A quiet moment said more than words could.',              FALSE, $1),
+      ('We connected in a moment that felt effortless.',          TRUE,  $1),
+      ('One meaningful moment can outlast years.',                TRUE,  $2),
+      ('Moments create the memories people carry forever.',       TRUE,  $2),
+      ('A brief encounter became a lasting bond.',                FALSE, $2)
   `, [alice.user_id, bob.user_id]);
 
   return users;
