@@ -1,6 +1,6 @@
-# Daily Memory App — Full-Stack Case Study
+# Expense Tracker App
 
-A full-stack time daily memory app built with React, Express, and Postgres. Demonstrates session-based authentication, session rehydration, auth-dependent data fetching, and conditional rendering — the same patterns students use in their full-stack projects.
+A full-stack expense tracker app built with React, Express, and Postgres. Demonstrates session-based authentication, session rehydration, auth-dependent data fetching, and conditional rendering — the same patterns students use in their full-stack projects.
 
 ## User Stories
 **Auth**
@@ -9,30 +9,32 @@ A full-stack time daily memory app built with React, Express, and Postgres. Demo
 - A user can log out
 - A returning user who has an active session is automatically logged in when they revisit the app
 
-**Memo**
-- A logged-in user can see all of their memos
-- A logged-in user can create a new memo by entering description
-- A logged-in user can mark a memo public or private
-- A logged-in user can delete a memo
+**Expense**
+- A logged-in user can see all of their expenses
+- A logged-in user can create a new expense by entering title, amount, category, and expense date
+- A logged-in user can mark a expense public or private
+- A logged-in user can delete a expense
 
 ## Schema
 
 ```
 users
 ─────────────────────────────
-user_id       SERIAL PRIMARY KEY
-username      TEXT UNIQUE NOT NULL
-password_hash TEXT NOT NULL
+user_id         SERIAL PRIMARY KEY
+username        TEXT UNIQUE NOT NULL
+password_hash   TEXT NOT NULL
 
 memos
 ─────────────────────────────
-memo_id  SERIAL PRIMARY KEY
-description TEXT NOT NULL
-is_public   BOOLEAN DEFAULT FALSE
-user_id     INTEGER REFERENCES users(user_id) ON DELETE CASCADE
+expense_id      SERIAL PRIMARY KEY
+title           TEXT NOT NULL
+amount          NUMERIC(10,2) NOT NULL
+category        TEXT NOT NULL
+expense_date    DATE NOT NULL DEFAULT CURRENT_DATE
+user_id         INTEGER REFERENCES users(user_id) ON DELETE CASCADE
 ```
 
-A user has many capsules. Deleting a user cascades to delete all of their memos.
+A user has many expenses. Deleting a user cascades to delete all of their expenses.
 
 ## API Contract
 
@@ -45,14 +47,14 @@ A user has many capsules. Deleting a user cascades to delete all of their memos.
 | DELETE | `/api/auth/logout`   | —                        | `{ message }`                     |
 | GET    | `/api/auth/me`       | —                        | `{ user_id, username }` or `null` |
 
-### Todo endpoints (all require authentication)
+### Expense endpoints (all require authentication)
 
-| Method | Endpoint              | Request Body      | Response                                     |
-| ------ | --------------------- | ----------------- | -------------------------------------------- |
-| GET    | `/api/memos`          | —                 | `[{ memo_id, title, is_public, user_id }]` |
-| POST   | `/api/memos`          | `{ title }`       | `{ memo_id, title, is_public, user_id }`   |
-| PATCH  | `/api/memos/:memo_id` | `{ is_public }` | `{ memo_id, title, is_public, user_id }`   |
-| DELETE | `/api/memos/:memo_id` | —                 | `{ memo_id, title, is_public, user_id }`   |
+| Method | Endpoint                  | Request Body                                | Response                                     |
+| ------ | ------------------------  | ------------------------------------------- | -------------------------------------------- |
+| GET    | `/api/expenses`           | —                                           | `[{ expense_id, title, amount, category, expense_date, user_id }]` |
+| POST   | `/api/expenses`           | `{ title, amount, category expense_date }`  | `{ expense_id, title, amount, category, expense_date, user_id }`   |
+| PATCH  | `/api/expenses/:entry_id` | `{ title, amount, category, expense_date }` | `{ expense_id, title, amount, category, expense_date, user_id }`   |
+| DELETE | `/api/expenses/:entry_id` | —                                           | `{ expense_id, title, amount, category, expense_date, user_id }`   |
 
 ## Setup
 
@@ -61,7 +63,7 @@ A user has many capsules. Deleting a user cascades to delete all of their memos.
 Create a local Postgres database:
 
 ```sh
-createdb memos
+createdb daily_journal
 ```
 
 ### 2. Server
@@ -106,35 +108,33 @@ After running `npm run db:seed`, these accounts are available:
 | -------- | ----------- |
 | alice    | password123 |
 | bob      | password123 |
+| liam      | password123 |
 
 ## Application Structure
 
 ```
-swe-casestudy-7-todo-app/
+full-stack-project-remix-evu725/
 ├── frontend/               # React app (Vite)
 │   ├── src/
 │   │   ├── App.jsx         # Root component: currentUser state, session rehydration, auth handlers
 │   │   ├── adapters/
 │   │   │   ├── auth-adapters.js  # Fetch adapters for /api/auth/* endpoints
-│   │   │   └── memo-adapters.js  # Fetch adapters for /api/todos/* endpoints
+│   │   │   └── expense-adapters.js  # Fetch adapters for /api/expenses/* endpoints
 │   │   └── components/
 │   │       ├── AuthPage.jsx    # Login + Register forms (shown when logged out)
-│   │       ├── MemoPage.jsx    # Main app container (shown when logged in)
-│   │       ├── MemoPage.jsx    # Main app container (shown when logged in)
-│   │       ├── AddMemoForm.jsx # Form to create a new todo
-│   │       ├── AddTodoForm.jsx # Form to create a new todo
-│   │       ├── MemoList.jsx    # Renders a list of MemoItems
-│   │       ├── MemoList.jsx    # Renders a list of MemoItems
-│   │       └── MemoItem.jsx    # Single memo: checkbox, title, delete button
+│   │       ├── ExpensePage.jsx    # Main app container (shown when logged in)
+│   │       ├── AddExpenseForm.jsx # Form to create a new expense
+│   │       ├── ExpenseList.jsx    # Renders a list of ExpenseItems
+│   │       └── ExpenseItem.jsx    # Single expense: title, amount, delete button
 │   └── vite.config.js      # Proxies /api requests to Express in development
 └── server/                 # Express + Postgres API
     ├── index.js            # App entry point, route definitions
     ├── controllers/
     │   ├── authControllers.js  # register, login, logout, getMe
-    │   └── memoControllers.js  # list, create, update, delete todos
+    │   └── expenseControllers.js  # list, create, update, delete expenses
     ├── models/
     │   ├── userModel.js    # SQL queries for the users table
-    │   └── memoModel.js    # SQL queries for the memos table
+    │   └── expenseModel.js    # SQL queries for the expenses table
     ├── middleware/
     │   ├── checkAuthentication.js  # Blocks unauthenticated requests
     │   └── logRoutes.js            # Logs each incoming request
