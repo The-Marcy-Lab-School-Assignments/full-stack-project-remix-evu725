@@ -4,8 +4,8 @@ const pool = require('./pool');
 const SALT_ROUNDS = 8;
 
 const seed = async () => {
-  // Drop tables in reverse dependency order (todos references users via FK)
-  await pool.query('DROP TABLE IF EXISTS memos');
+  // Drop tables in reverse dependency order (expenses references users via FK)
+  await pool.query('DROP TABLE IF EXISTS expenses');
   await pool.query('DROP TABLE IF EXISTS users');
 
   await pool.query(`
@@ -17,16 +17,19 @@ const seed = async () => {
   `);
 
   await pool.query(`
-    CREATE TABLE memos (
-      memo_id     SERIAL PRIMARY KEY,
-      title       TEXT NOT NULL,
-      is_public BOOLEAN NOT NULL DEFAULT FALSE,
-      user_id     INT REFERENCES users(user_id) ON DELETE CASCADE
+    CREATE TABLE expenses (
+      expense_id     SERIAL PRIMARY KEY,
+      title          TEXT NOT NULL,
+      amount         NUMERIC(10,2) NOT NULL,
+      category       TEXT NOT NULL,
+      expense_date   DATE NOT NULL DEFAULT CURRENT_DATE,
+      user_id        INT REFERENCES users(user_id) ON DELETE CASCADE
     )
   `);
 
   // Hash passwords in parallel — bcrypt is slow by design (CPU-bound hashing)
-  const [aliceHash, bobHash] = await Promise.all([
+  const [aliceHash, bobHash, liamHash] = await Promise.all([
+    bcrypt.hash('password123', SALT_ROUNDS),
     bcrypt.hash('password123', SALT_ROUNDS),
     bcrypt.hash('password123', SALT_ROUNDS),
   ]);
@@ -35,31 +38,31 @@ const seed = async () => {
   const { rows: users } = await pool.query(`
     INSERT INTO users (username, password_hash) VALUES
       ('alice', $1),
-      ('bob',   $2)
+      ('bob',   $2),
+      ('liam',  $3)
     RETURNING user_id, username
-  `, [aliceHash, bobHash]);
+  `, [aliceHash, bobHash, liamHash]);
 
-  const [alice, bob] = users;
-
-  // await pool.query(`
-  //   INSERT INTO todos (title, is_complete, user_id) VALUES
-  //     ('Buy groceries',        FALSE, $1),
-  //     ('Walk the dog',         FALSE, $1),
-  //     ('Read a book',          TRUE,  $1),
-  //     ('Set up the database',  TRUE,  $2),
-  //     ('Build the API',        TRUE,  $2),
-  //     ('Build the frontend',   FALSE, $2)
-  // `, [alice.user_id, bob.user_id]);
+  const [alice, bob, liam] = users;
 
   await pool.query(`
-    INSERT INTO todos (title, is_complete, user_id) VALUES
-      ('Certain moments stay with you forever.',                  FALSE, $1),
-      ('A quiet moment said more than words could.',              FALSE, $1),
-      ('We connected in a moment that felt effortless.',          TRUE,  $1),
-      ('One meaningful moment can outlast years.',                TRUE,  $2),
-      ('Moments create the memories people carry forever.',       TRUE,  $2),
-      ('A brief encounter became a lasting bond.',                FALSE, $2)
-  `, [alice.user_id, bob.user_id]);
+    INSERT INTO expenses (title, amount, category, expense_date, user_id)
+    VALUES
+      -- Alice expenses
+      ('Groceries at Walmart', 54.23, 'Food', '2026-05-10', $1),
+      ('Uber ride', 18.75, 'Transport', '2026-05-11', $1),
+      ('Netflix subscription', 15.99, 'Entertainment', '2026-05-01', $1),
+
+      -- Bob expenses
+      ('Coffee', 5.50, 'Food', '2026-05-12', $2),
+      ('Gas refill', 40.00, 'Transport', '2026-05-09', $2),
+      ('Amazon purchase', 89.99, 'Shopping', '2026-05-08', $2),
+
+      -- Liam expenses
+      ('Lunch', 12.30, 'Food', '2026-05-13', $3),
+      ('Gym membership', 29.99, 'Health', '2026-05-01', $3),
+      ('Movie ticket', 14.00, 'Entertainment', '2026-05-07', $3)
+  `, [alice.user_id, bob.user_id, liam.user_id]);
 
   return users;
 };
