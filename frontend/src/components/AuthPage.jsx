@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function LoginForm({ handleLogin }) {
+function LoginForm({ handleLogin, switchToRegister }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
@@ -15,7 +15,11 @@ function LoginForm({ handleLogin }) {
 
   return (
     <form onSubmit={handleSubmit}>
+      <p className='aa'>•ᴗ•</p>
+      <h1>Budget Buddy</h1>
+      <p className='subtext'>Where everything goes, here it is</p>
       <h2>Log In</h2>
+
       <input
         type="text"
         placeholder="Username"
@@ -23,6 +27,7 @@ function LoginForm({ handleLogin }) {
         onChange={(e) => setUsername(e.target.value)}
         required
       />
+
       <input
         type="password"
         placeholder="Password"
@@ -30,13 +35,22 @@ function LoginForm({ handleLogin }) {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
+
       {errorMessage && <p className="error">{errorMessage}</p>}
+
       <button type="submit">Log In</button>
+
+      <p>
+        Don't have an account?{' '}
+        <button type="button" onClick={switchToRegister}>
+          Click here
+        </button>
+      </p>
     </form>
   );
 }
 
-function RegisterForm({ handleRegister }) {
+function RegisterForm({ handleRegister, switchToLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
@@ -52,6 +66,7 @@ function RegisterForm({ handleRegister }) {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Register</h2>
+
       <input
         type="text"
         placeholder="Username"
@@ -59,6 +74,7 @@ function RegisterForm({ handleRegister }) {
         onChange={(e) => setUsername(e.target.value)}
         required
       />
+
       <input
         type="password"
         placeholder="Password"
@@ -66,17 +82,38 @@ function RegisterForm({ handleRegister }) {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
+
       {errorMessage && <p className="error">{errorMessage}</p>}
+
       <button type="submit">Register</button>
+
+      <p>
+        Already have an account?{' '}
+        <button type="button" onClick={switchToLogin}>
+          Log in here
+        </button>
+      </p>
     </form>
   );
 }
 
 function AuthPage({ handleLogin, handleRegister }) {
+  const [isLogin, setIsLogin] = useState(true);
+
   return (
     <div id="auth-section">
-      <LoginForm handleLogin={handleLogin} />
-      <RegisterForm handleRegister={handleRegister} />
+      
+      {isLogin ? (
+        <LoginForm
+          handleLogin={handleLogin}
+          switchToRegister={() => setIsLogin(false)}
+        />
+      ) : (
+        <RegisterForm
+          handleRegister={handleRegister}
+          switchToLogin={() => setIsLogin(true)}
+        />
+      )}
     </div>
   );
 }

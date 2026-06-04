@@ -2,7 +2,7 @@ const pool = require('../db/pool');
 
 // Return all expenses from specific user
 module.exports.listByUser = async (user_id) => {
-    const query =  'SELECT * FROM expenses WHERE user_id = $1 ORDER BY expense_id ASC';
+    const query = 'SELECT * FROM expenses WHERE user_id = $1 ORDER BY expense_id ASC';
     const { rows } = await pool.query(query, [user_id]);
     return rows;
 }
@@ -23,8 +23,8 @@ module.exports.create = async (title, amount, category, expense_date, user_id) =
 
 // Updates an expense and returns the updated row.
 module.exports.update = async (title, amount, category, expense_date, expense_id) => {
-    const query = 'UPDATE expenses SET title = $1, amount = $2, category = $3, expense_date = $4 WHERE expense_id = $5 RETURNING *';
-    const { rows } = await pool.query(query, [title, amount, category, expense_date, expense_id]);
+  const query = `UPDATE expenses SET title = $1, amount = $2, category = $3, expense_date = $4 WHERE expense_id = $5 RETURNING *`;
+  const { rows } = await pool.query(query, [title, amount, category, expense_date, expense_id,]);
     return rows[0];
 }
 

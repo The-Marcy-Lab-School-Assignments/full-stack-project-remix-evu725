@@ -6,8 +6,8 @@
 
 body {
   font-family: system-ui, sans-serif;
-  background: #f5f5f5;
-  color: #1a1a1a;
+  background: #EBF5E9;
+  color: #1D4840;
 }
 
 main {
@@ -19,7 +19,7 @@ main {
 h1 {
   font-size: 1.75rem;
   margin-bottom: 1.5rem;
-  color: #1d4ed8;
+  color: #1D4840;
 }
 
 /* Auth forms */
@@ -29,17 +29,29 @@ h1 {
 }
 
 form {
-  background: white;
+  background: #ffffff;
   padding: 1.5rem;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #CFE3D0;
   flex: 1;
+}
+
+form p {
+  text-align: center;
+}
+
+form h1 {
+  text-align: center;
+}
+
+.aa {
+  font-size: 42px;
 }
 
 form h2 {
   margin-bottom: 1rem;
   font-size: 1.1rem;
-  color: #374151;
+  color: #1D4840;
 }
 
 form input {
@@ -47,14 +59,14 @@ form input {
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #CFE3D0;
   border-radius: 4px;
   font-size: 0.95rem;
 }
 
 form button[type='submit'] {
-  background: #1d4ed8;
-  color: white;
+  background: #1D4840;
+  color: #ffffff;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -63,7 +75,7 @@ form button[type='submit'] {
 }
 
 .error {
-  color: #dc2626;
+  color: #C0392B;
   font-size: 0.85rem;
   margin-bottom: 0.5rem;
 }
@@ -79,14 +91,14 @@ section {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: white;
+  background: #ffffff;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #CFE3D0;
 }
 
 #user-controls button {
-  background: #dc2626;
+  background: #C0392B;
   color: white;
   border: none;
   padding: 0.4rem 0.8rem;
@@ -99,30 +111,30 @@ section {
 #add-todo-form {
   display: flex;
   gap: 0.5rem;
-  background: white;
+  background: #ffffff;
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #CFE3D0;
   flex-direction: column;
 }
 
 #add-todo-form label {
   font-size: 0.9rem;
-  color: #374151;
+  color: #1D4840;
   display: none;
 }
 
 #add-todo-form input {
   flex: 1;
   padding: 0.5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #CFE3D0;
   border-radius: 4px;
   font-size: 0.95rem;
   margin-bottom: 0;
 }
 
 #add-todo-form button {
-  background: #1d4ed8;
+  background: #1D4840;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -140,8 +152,8 @@ section {
 }
 
 .todo-item {
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  border: 1px solid #CFE3D0;
   border-radius: 8px;
   padding: 0.75rem 1rem;
   display: flex;
@@ -163,11 +175,11 @@ section {
 
 .todo-item span.completed {
   text-decoration: line-through;
-  color: #9ca3af;
+  color: #7A8A83;
 }
 
 .delete-btn {
-  background: #dc2626;
+  background: #C0392B;
   color: white;
   border: none;
   padding: 0.3rem 0.6rem;
@@ -181,5 +193,117 @@ section {
   #add-todo-form {
     flex-direction: row;
     align-items: flex-end;
+  }
+}
+
+/* Expense List */
+#expense-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Expense Card */
+.expense-item {
+  background: #fff;
+  border: 1px solid #CFE3D0;
+  border-radius: 12px;
+  padding: 1rem;
+
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto auto;
+  align-items: center;
+  gap: 1rem;
+
+  box-shadow: 0 2px 8px rgba(29, 72, 64, 0.08);
+
+  /* prevents micro-shake */
+  transform: translateZ(0);
+}
+
+/* Text */
+.expense-item strong {
+  color: #1D4840;
+  font-size: 1rem;
+}
+
+.expense-item div {
+  color: #35574F;
+  font-size: 0.95rem;
+}
+
+/* Inputs */
+.expense-item input {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #CFE3D0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #1D4840;
+  box-sizing: border-box;
+}
+
+.expense-item input:focus {
+  outline: none;
+  border-color: #1D4840;
+  box-shadow: 0 0 0 2px rgba(29, 72, 64, 0.15);
+}
+
+/* Buttons */
+.expense-item button {
+  border: none;
+  border-radius: 6px;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+/* Primary (Edit / Save) */
+.expense-item button:first-of-type {
+  background: #1D4840;
+  color: white;
+}
+
+/* Danger (Delete / Cancel) */
+.expense-item button:last-of-type {
+  background: #C0392B;
+  color: white;
+}
+
+.expense-item button:hover {
+  opacity: 0.9;
+}
+
+/* EDIT MODE (IMPORTANT FIX) */
+.expense-item.editing {
+  grid-template-columns: 1fr;
+}
+
+/* make inputs stack nicely in edit mode */
+.expense-item.editing input {
+  width: 100%;
+}
+
+/* button row in edit mode */
+.edit-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .expense-item {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+
+  .expense-item button {
+    width: 100%;
   }
 }

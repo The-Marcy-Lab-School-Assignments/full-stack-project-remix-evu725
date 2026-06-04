@@ -1,5 +1,5 @@
-const { Pool } = require('pg');
 require('dotenv').config();
+const { Pool } = require('pg');
 
 // A pool maintains a set of connections to the database that remain open and
 // can be dynamically allocated each time we send a query. This is more efficient

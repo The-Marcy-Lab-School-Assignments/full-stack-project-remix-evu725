@@ -14,7 +14,7 @@ module.exports.listExpenses = async (req, res, next) => {
 module.exports.createExpense = async (req, res, next) => {
   try {
     const { title, amount, category, expense_date } = req.body;
-    if (!title || !amount || !category || !expense_date) return res.status(400).send({ error: 'All expense fields are required.' });
+    if (title == null || amount == null || category == null || expense_date == null) return res.status(400).send({ error: 'All expense fields are required.' });
     const expense = await expenseModel.create(title, amount, category, expense_date, req.session.user_id);
     res.status(201).send(expense);
   } catch (err) {

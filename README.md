@@ -63,7 +63,7 @@ A user has many expenses. Deleting a user cascades to delete all of their expens
 Create a local Postgres database:
 
 ```sh
-createdb daily_journal
+createdb expenses_db
 ```
 
 ### 2. Server
