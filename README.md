@@ -12,8 +12,16 @@ A full-stack expense tracker app built with React, Express, and Postgres. Demons
 **Expense**
 - A logged-in user can see all of their expenses
 - A logged-in user can create a new expense by entering title, amount, category, and expense date
-- A logged-in user can mark a expense public or private
-- A logged-in user can delete a expense
+- A logged-in user can edit an existing expense inline
+- A logged-in user can delete an expense
+
+**Dashboard**
+- A logged-in user can see summary cards: amount spent this month, top spending category, and total transaction count
+- A logged-in user can view a Reports page with a monthly spending chart (last 6 months) and a category breakdown
+
+**Settings**
+- A logged-in user can change their password
+- A logged-in user can toggle dark mode
 
 ## Schema
 
@@ -24,7 +32,7 @@ user_id         SERIAL PRIMARY KEY
 username        TEXT UNIQUE NOT NULL
 password_hash   TEXT NOT NULL
 
-memos
+expenses
 ─────────────────────────────
 expense_id      SERIAL PRIMARY KEY
 title           TEXT NOT NULL
@@ -42,10 +50,11 @@ A user has many expenses. Deleting a user cascades to delete all of their expens
 
 | Method | Endpoint             | Request Body             | Response                          |
 | ------ | -------------------- | ------------------------ | --------------------------------- |
-| POST   | `/api/auth/register` | `{ username, password }` | `{ user_id, username }`           |
-| POST   | `/api/auth/login`    | `{ username, password }` | `{ user_id, username }`           |
-| DELETE | `/api/auth/logout`   | —                        | `{ message }`                     |
-| GET    | `/api/auth/me`       | —                        | `{ user_id, username }` or `null` |
+| POST   | `/api/auth/register`  | `{ username, password }`           | `{ user_id, username }`           |
+| POST   | `/api/auth/login`     | `{ username, password }`           | `{ user_id, username }`           |
+| DELETE | `/api/auth/logout`    | —                                  | `{ message }`                     |
+| GET    | `/api/auth/me`        | —                                  | `{ user_id, username }` or `null` |
+| PATCH  | `/api/auth/password`  | `{ currentPassword, newPassword }` | `{ message }`                     |
 
 ### Expense endpoints (all require authentication)
 
@@ -53,8 +62,8 @@ A user has many expenses. Deleting a user cascades to delete all of their expens
 | ------ | ------------------------  | ------------------------------------------- | -------------------------------------------- |
 | GET    | `/api/expenses`           | —                                           | `[{ expense_id, title, amount, category, expense_date, user_id }]` |
 | POST   | `/api/expenses`           | `{ title, amount, category expense_date }`  | `{ expense_id, title, amount, category, expense_date, user_id }`   |
-| PATCH  | `/api/expenses/:entry_id` | `{ title, amount, category, expense_date }` | `{ expense_id, title, amount, category, expense_date, user_id }`   |
-| DELETE | `/api/expenses/:entry_id` | —                                           | `{ expense_id, title, amount, category, expense_date, user_id }`   |
+| PATCH  | `/api/expenses/:expense_id` | `{ title, amount, category, expense_date }` | `{ expense_id, title, amount, category, expense_date, user_id }`   |
+| DELETE | `/api/expenses/:expense_id` | —                                           | `{ expense_id, title, amount, category, expense_date, user_id }`   |
 
 ## Setup
 
@@ -116,25 +125,30 @@ After running `npm run db:seed`, these accounts are available:
 full-stack-project-remix-evu725/
 ├── frontend/               # React app (Vite)
 │   ├── src/
-│   │   ├── App.jsx         # Root component: currentUser state, session rehydration, auth handlers
+│   │   ├── App.jsx         # Root component: currentUser state, dark mode, session rehydration, auth handlers
 │   │   ├── adapters/
-│   │   │   ├── auth-adapters.js  # Fetch adapters for /api/auth/* endpoints
+│   │   │   ├── auth-adapters.js     # Fetch adapters for /api/auth/* endpoints (incl. changePassword)
 │   │   │   └── expense-adapters.js  # Fetch adapters for /api/expenses/* endpoints
 │   │   └── components/
-│   │       ├── AuthPage.jsx    # Login + Register forms (shown when logged out)
-│   │       ├── ExpensePage.jsx    # Main app container (shown when logged in)
-│   │       ├── AddExpenseForm.jsx # Form to create a new expense
-│   │       ├── ExpenseList.jsx    # Renders a list of ExpenseItems
-│   │       └── ExpenseItem.jsx    # Single expense: title, amount, delete button
+│   │       ├── AuthPage.jsx         # Login + Register forms (shown when logged out)
+│   │       ├── DashboardLayout.jsx  # Sidebar + page routing (dashboard, reports, settings)
+│   │       ├── Sidebar.jsx          # Navigation sidebar with user info and logout
+│   │       ├── ExpensePage.jsx      # Dashboard view: summary cards, add form, expense list
+│   │       ├── SummaryCards.jsx     # Cards showing this month's total, top category, transaction count
+│   │       ├── AddExpenseForm.jsx   # Form to create a new expense
+│   │       ├── ExpenseList.jsx      # Renders a list of ExpenseItems
+│   │       ├── ExpenseItem.jsx      # Single expense with inline edit and delete
+│   │       ├── ReportPage.jsx       # Monthly spending chart and category breakdown
+│   │       └── SettingsPage.jsx     # Change password form and dark mode toggle
 │   └── vite.config.js      # Proxies /api requests to Express in development
 └── server/                 # Express + Postgres API
     ├── index.js            # App entry point, route definitions
     ├── controllers/
-    │   ├── authControllers.js  # register, login, logout, getMe
-    │   └── expenseControllers.js  # list, create, update, delete expenses
+    │   ├── authControllers.js    # register, login, logout, getMe, changePassword
+    │   └── expenseControllers.js # list, create, update, delete expenses
     ├── models/
     │   ├── userModel.js    # SQL queries for the users table
-    │   └── expenseModel.js    # SQL queries for the expenses table
+    │   └── expenseModel.js # SQL queries for the expenses table
     ├── middleware/
     │   ├── checkAuthentication.js  # Blocks unauthenticated requests
     │   └── logRoutes.js            # Logs each incoming request
