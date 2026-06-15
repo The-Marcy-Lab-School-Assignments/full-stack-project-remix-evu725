@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { getMe, login, register, logout } from './adapters/auth-adapters';
 import AuthPage from './components/AuthPage';
-import ExpensePage from './components/ExpensePage';
+import DashboardLayout from './components/DashboardLayout';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('darkMode') === 'true');
 
-  // On every page load, check the server for an active session cookie.
-  // React state doesn't survive a refresh; session cookies do.
   useEffect(() => {
     const checkForSession = async () => {
       const { data: user } = await getMe();
@@ -16,9 +15,13 @@ function App() {
     checkForSession();
   }, []);
 
-  // Handlers that manage updating the current user. 
-  // Defined in App to ensure that child components only                       
-  // update the current user in a controlled manner.  
+  useEffect(() => {
+    document.body.classList.toggle('dark', isDarkMode);
+    localStorage.setItem('darkMode', isDarkMode);
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
+
   const handleLogin = async (username, password) => {
     const { data: user, error } = await login(username, password);
     if (error) return error;
@@ -39,7 +42,12 @@ function App() {
   return (
     <main>
       {currentUser
-        ? <ExpensePage currentUser={currentUser} handleLogout={handleLogout} />
+        ? <DashboardLayout
+            currentUser={currentUser}
+            handleLogout={handleLogout}
+            isDarkMode={isDarkMode}
+            toggleDarkMode={toggleDarkMode}
+          />
         : <AuthPage handleLogin={handleLogin} handleRegister={handleRegister} />
       }
     </main>

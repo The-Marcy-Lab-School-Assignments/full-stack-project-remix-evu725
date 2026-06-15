@@ -32,3 +32,11 @@ export const login = async (username, password) => {
 export const logout = async () => {
   return handleFetch('/api/auth/logout', { method: 'DELETE' });
 };
+
+export const changePassword = async (currentPassword, newPassword) => {
+  return handleFetch('/api/auth/password', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+};

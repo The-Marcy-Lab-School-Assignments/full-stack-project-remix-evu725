@@ -1,99 +1,86 @@
 import { useState } from 'react';
 
-function LoginForm({ handleLogin, switchToRegister }) {
+function LoginForm({ handleLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const error = await handleLogin(username, password);
-    if (error) {
-      setErrorMessage('Invalid username or password.');
-    }
+    const err = await handleLogin(username, password);
+    if (err) setError('Invalid username or password.');
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <p className='aa'>•ᴗ•</p>
-      <h1>Budget Buddy</h1>
-      <p className='subtext'>Where everything goes, here it is</p>
-      <h2>Log In</h2>
-
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-      />
-
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-
-      {errorMessage && <p className="error">{errorMessage}</p>}
-
-      <button type="submit">Log In</button>
-
-      <p>
-        Don't have an account?{' '}
-        <button type="button" onClick={switchToRegister}>
-          Click here
-        </button>
-      </p>
-    </form>
+    <div className="auth-form">
+      <form onSubmit={handleSubmit}>
+        <div className="field">
+          <label>Username</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter your username"
+            required
+            autoFocus
+          />
+        </div>
+        <div className="field">
+          <label>Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+        {error && <p className="error-msg">{error}</p>}
+        <button className="btn-primary" type="submit">Sign In</button>
+      </form>
+    </div>
   );
 }
 
-function RegisterForm({ handleRegister, switchToLogin }) {
+function RegisterForm({ handleRegister }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const error = await handleRegister(username, password);
-    if (error) {
-      setErrorMessage('Could not register. Username may already be taken.');
-    }
+    const err = await handleRegister(username, password);
+    if (err) setError('Could not register. Username may already be taken.');
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Register</h2>
-
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-      />
-
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-
-      {errorMessage && <p className="error">{errorMessage}</p>}
-
-      <button type="submit">Register</button>
-
-      <p>
-        Already have an account?{' '}
-        <button type="button" onClick={switchToLogin}>
-          Log in here
-        </button>
-      </p>
-    </form>
+    <div className="auth-form">
+      <form onSubmit={handleSubmit}>
+        <div className="field">
+          <label>Username</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Choose a username"
+            required
+            autoFocus
+          />
+        </div>
+        <div className="field">
+          <label>Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Choose a password"
+            required
+          />
+        </div>
+        {error && <p className="error-msg">{error}</p>}
+        <button className="btn-primary" type="submit">Create Account</button>
+      </form>
+    </div>
   );
 }
 
@@ -101,19 +88,33 @@ function AuthPage({ handleLogin, handleRegister }) {
   const [isLogin, setIsLogin] = useState(true);
 
   return (
-    <div id="auth-section">
-      
-      {isLogin ? (
-        <LoginForm
-          handleLogin={handleLogin}
-          switchToRegister={() => setIsLogin(false)}
-        />
-      ) : (
-        <RegisterForm
-          handleRegister={handleRegister}
-          switchToLogin={() => setIsLogin(true)}
-        />
-      )}
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-brand">
+          <h1>Budget Buddy</h1>
+          <p>Track your spending effortlessly</p>
+        </div>
+        <div className="auth-tabs">
+          <button
+            type="button"
+            className={`auth-tab${isLogin ? ' active' : ''}`}
+            onClick={() => setIsLogin(true)}
+          >
+            Sign In
+          </button>
+          <button
+            type="button"
+            className={`auth-tab${!isLogin ? ' active' : ''}`}
+            onClick={() => setIsLogin(false)}
+          >
+            Register
+          </button>
+        </div>
+        {isLogin
+          ? <LoginForm handleLogin={handleLogin} />
+          : <RegisterForm handleRegister={handleRegister} />
+        }
+      </div>
     </div>
   );
 }

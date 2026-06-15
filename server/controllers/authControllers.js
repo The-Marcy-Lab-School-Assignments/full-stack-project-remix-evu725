@@ -49,3 +49,19 @@ module.exports.logout = (req, res) => {
   req.session = null;
   res.send({ message: 'Logged out.' });
 };
+
+module.exports.changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).send({ error: 'Both fields are required.' });
+    }
+    const user = await userModel.find(req.session.user_id);
+    const valid = await userModel.validatePassword(user.username, currentPassword);
+    if (!valid) return res.status(401).send({ error: 'Current password is incorrect.' });
+    await userModel.updatePassword(req.session.user_id, newPassword);
+    res.send({ message: 'Password updated.' });
+  } catch (err) {
+    next(err);
+  }
+};
